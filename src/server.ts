@@ -40,7 +40,7 @@ import fs from 'fs';
 
   app.get( "/filteredimage", async ( req, res ) => {
     if(req.query.image_url) {
-      //used URL regex from 
+      //used URL regex from https://stackoverflow.com/questions/3809401/what-is-a-good-regular-expression-to-match-a-url
       if(/https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/.test(req.query.image_url)) {
         let imgPath:string = await filterImageFromURL(req.query.image_url);
         res.sendFile(imgPath);
