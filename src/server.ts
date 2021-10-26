@@ -1,4 +1,5 @@
 import express from 'express';
+import {Request, Response} from 'express';
 import bodyParser from 'body-parser';
 import {filterImageFromURL, deleteLocalFiles} from './util/util';
 import fs from 'fs';
@@ -34,15 +35,15 @@ import fs from 'fs';
   
   // Root Endpoint
   // Displays a simple message to the user
-  app.get( "/", async ( req, res ) => {
+  app.get( "/", async ( req: Request, res: Response ) => {
     res.send("try GET /filteredimage?image_url={{}}")
   } );
 
-  app.get( "/filteredimage", async ( req, res ) => {
+  app.get( "/filteredimage", async ( req: Request, res: Response ) => {
     if(req.query.image_url) {
-      //used URL regex from 
+      //used URL regex from https://stackoverflow.com/questions/3809401/what-is-a-good-regular-expression-to-match-a-url
       if(/https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/.test(req.query.image_url)) {
-        let imgPath:string = await filterImageFromURL(req.query.image_url);
+        let imgPath:string = await filterImageFromURL(req.query.image_url) as string;
         res.sendFile(imgPath);
 
         res.on('finish', () => {
