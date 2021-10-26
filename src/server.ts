@@ -1,6 +1,7 @@
 import express from 'express';
 import bodyParser from 'body-parser';
 import {filterImageFromURL, deleteLocalFiles} from './util/util';
+import fs from 'fs';
 
 (async () => {
 
@@ -36,8 +37,26 @@ import {filterImageFromURL, deleteLocalFiles} from './util/util';
   app.get( "/", async ( req, res ) => {
     res.send("try GET /filteredimage?image_url={{}}")
   } );
-  
 
+  app.get( "/filteredimage", async ( req, res ) => {
+    if(req.query.image_url) {
+      //used URL regex from 
+      if(/https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/.test(req.query.image_url)) {
+        let imgPath:string = await filterImageFromURL(req.query.image_url);
+        res.sendFile(imgPath);
+
+        res.on('finish', () => {
+          let files:Array<string> = [];
+          fs.readdirSync(__dirname+'/util/tmp/').forEach(file => {
+            files.push(__dirname+'/util/tmp/' + file);
+          });
+          deleteLocalFiles(files);
+        });
+      } else res.status(422).send("Invalid Image URL");
+    } else res.status(400).send("Missing Image URL");
+    
+  });
+  
   // Start the Server
   app.listen( port, () => {
       console.log( `server running http://localhost:${ port }` );
